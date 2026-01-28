@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+@theme {
+  /* Premium Midnight Palette */
+  --color-slate-850: #1e293b;
+  /* Deep slate */
+  --color-gold-400: #fbbf24;
+  --color-gold-500: #f59e0b;
+  --color-gold-600: #d97706;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-playfair), ui-serif, Georgia, Cambria, serif;
+}
+
+:root {
+  /* Base */
+  --background: 248 250 252;
+  /* Slate-50 */
+  --foreground: 15 23 42;
+  /* Slate-900 */
+
+  --card: 255 255 255;
+  --card-foreground: 15 23 42;
+
+  --popover: 255 255 255;
+  --popover-foreground: 15 23 42;
+
+  /* Primary - Midnight Blue */
+  --primary: 15 23 42;
+  --primary-foreground: 255 255 255;
+
+  /* Secondary - Gold/Amber */
+  --secondary: 245 158 11;
+  --secondary-foreground: 255 255 255;
+
+  /* Muted */
+  --muted: 241 245 249;
+  --muted-foreground: 100 116 139;
+
+  /* Accent - Soft Gold/Slate */
+  --accent: 255 251 235;
+  /* Amber-50 */
+  --accent-foreground: 15 23 42;
+
+  /* Destructive */
+  --destructive: 239 68 68;
+  --destructive-foreground: 255 255 255;
+
+  /* Border/Input */
+  --border: 226 232 240;
+  --input: 226 232 240;
+  --ring: 245 158 11;
+  /* Gold Ring */
+}
+
+body {
+  color: #0f172a;
+  background-color: #f8fafc;
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+@layer utilities {
+  .glass {
+    @apply backdrop-blur-lg bg-white/80 border border-white/40 shadow-xl;
+  }
+
+  .glass-card {
+    @apply backdrop-blur-md bg-white/90 border border-slate-200 shadow-lg shadow-slate-900/5;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Premium Gold Gradient */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-amber-600;
+  }
+
+  /* Premium Dark Gradient */
+  .bg-gradient-premium {
+    @apply bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900;
+  }
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
