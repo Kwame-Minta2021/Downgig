@@ -5,7 +5,7 @@ import Header from '@/components/Header';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { Briefcase, CheckCircle, Clock, DollarSign, Star, User, Plus, Search, Users, FileText } from 'lucide-react';
+import { Briefcase, CheckCircle, Clock, DollarSign, Star, User, Plus, Search, Users, FileText, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import ProjectCard from '@/components/ProjectCard';
