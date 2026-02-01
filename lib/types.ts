@@ -52,6 +52,7 @@ export interface User {
   projectsPosted?: number; // Added for ProfilePage
   proposalsSent?: number; // Added for ProfilePage
   savedProjectIds?: number[]; // Added for SavedJobsPage
+  pendingBalance?: number; // Added for WalletPage
   link?: string;
   reviews?: Review[];
 }
