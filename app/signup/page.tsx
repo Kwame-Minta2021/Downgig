@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useApp } from '@/contexts/AppContext';
@@ -12,7 +12,13 @@ import { GraduationCap, Code, ArrowRight } from 'lucide-react';
 
 export default function SignupPage() {
     const router = useRouter();
-    const { signUp } = useApp();
+    const { signUp, currentUser } = useApp();
+
+    useEffect(() => {
+        if (currentUser) {
+            router.push('/dashboard');
+        }
+    }, [currentUser, router]);
 
     const [step, setStep] = useState<1 | 2>(1);
     const [role, setRole] = useState<Role | null>(null);

@@ -3,14 +3,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { User, Project, Message, Contract, Notification, Transaction, Meeting, PortfolioItem, Proposal } from '@/lib/types';
+import { User, Project, Message, Notification, Transaction, Meeting, PortfolioItem, Task } from '@/lib/types';
 
 interface AppContextType {
     currentUser: User | null;
     isLoading: boolean;
     projects: Project[];
+    tasks: Task[];
+    users: User[]; // Admin view of developers & global list
     messages: Message[];
-    contracts: Contract[];
     notifications: Notification[];
     transactions: Transaction[];
     meetings: Meeting[];
@@ -22,22 +23,21 @@ interface AppContextType {
 
     // Actions
     postProject: (data: any) => Promise<{ error: any }>;
-    getProjectById: (id: number) => Project | undefined; // Still synchronous for local state lookups, or could be async fetch
-    submitProposal: (data: { projectId: number; coverLetter: string; amount: number; timeline: string }) => Promise<{ error: any }>;
-    acceptProposal: (proposalId: number, projectId: number) => Promise<{ error: any }>;
+    getProjectById: (id: number) => Project | undefined;
     sendMessage: (receiverId: string, content: string) => Promise<{ error: any }>;
-    createContract: (proposal: Proposal, project: Project) => Promise<void>;
+
+    // Admin Actions
+    createTask: (task: Partial<Task>) => Promise<{ error: any }>;
+    assignTask: (taskId: number, developerId: string) => Promise<{ error: any }>;
+    updateTask: (taskId: number, updates: Partial<Task>) => Promise<{ error: any }>;
 
     // Misc
-    toggleSavedProject: (projectId: number) => void; // Local state or DB?
+    toggleSavedProject: (projectId: number) => void;
     markNotificationRead: (id: number) => void;
     scheduleMeeting: (data: any) => Promise<void>;
     addPortfolioItem: (item: any) => Promise<void>;
     updateProfile: (updates: Partial<User>) => Promise<{ error: any }>;
     uploadImage: (file: File, folder?: string) => Promise<string>;
-
-    // Global User List (for demo/messaging)
-    users: User[];
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -49,12 +49,90 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     // Local State Mirrors
     const [projects, setProjects] = useState<Project[]>([]);
+    const [tasks, setTasks] = useState<Task[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
-    const [contracts, setContracts] = useState<Contract[]>([]);
-    const [users, setUsers] = useState<User[]>([]); // Mirrors 'profiles' table
-
-    // Stubs for features not yet fully DB-backed (or less critical)
+    const [users, setUsers] = useState<User[]>([]);
     const [notifications, setNotifications] = useState<Notification[]>([]);
+
+    // ... (rest of state)
+
+    // --- Admin / Operations Actions ---
+
+    // Fetch all system data for Admin Dashboard
+    const fetchAdminData = async () => {
+        if (currentUser?.role !== 'admin') return;
+
+        const [projRes, devRes, taskRes] = await Promise.all([
+            supabase.from('projects').select('*').order('created_at', { ascending: false }),
+            supabase.from('profiles').select('*').eq('role', 'developer'),
+            supabase.from('tasks').select('*').order('created_at', { ascending: false })
+        ]);
+
+        if (projRes.data) setProjects(projRes.data as any);
+        if (devRes.data) setUsers(devRes.data as any);
+        if (taskRes.data) setTasks(taskRes.data as any);
+    };
+
+    const createTask = async (task: Partial<Task>) => {
+        const { error } = await supabase.from('tasks').insert([task]);
+        if (!error) {
+            // Optimistic update or refetch
+            if (currentUser?.role === 'admin') fetchAdminData();
+        }
+        return { error };
+    };
+
+    const assignTask = async (taskId: number, developerId: string) => {
+        const { error } = await supabase
+            .from('tasks')
+            .update({
+                assignee_id: developerId,
+                status: 'assigned'
+            })
+            .eq('id', taskId);
+
+        if (!error && currentUser?.role === 'admin') fetchAdminData();
+        return { error };
+    };
+
+    const updateTask = async (taskId: number, updates: Partial<Task>) => {
+        // Map camelCase to snake_case for DB if needed, but for now we rely on explicit mapping or auto-mapping if set up.
+        // Given current setup, we need to be careful. Let's assume the DB uses snake_case and we might need to map keys if we passed camelCase.
+        // However, looking at assignTask, it uses 'assignee_id'.
+        // Let's manually map common fields we expect to update.
+
+        const dbUpdates: any = {};
+        if (updates.status) dbUpdates.status = updates.status;
+        if (updates.title) dbUpdates.title = updates.title;
+
+        // TODO: specific fields like submission_url if we add them later. 
+        // For now, status is the main one.
+
+        const { error } = await supabase
+            .from('tasks')
+            .update(dbUpdates)
+            .eq('id', taskId);
+
+        if (!error) {
+            if (currentUser?.role === 'admin') fetchAdminData();
+            if (currentUser?.role === 'developer') fetchMyTasks();
+        }
+        return { error };
+    };
+
+    // --- Developer Actions ---
+
+    // Fetch tasks specifically for the logged-in developer
+    const fetchMyTasks = async () => {
+        if (!currentUser) return;
+        const { data } = await supabase
+            .from('tasks')
+            .select('*')
+            .eq('assignee_id', currentUser.id)
+            .order('created_at', { ascending: false });
+
+        if (data) setTasks(data as any);
+    };
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [meetings, setMeetings] = useState<Meeting[]>([]);
 
@@ -100,7 +178,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             } else if (event === 'SIGNED_OUT') {
                 setCurrentUser(null);
                 setMessages([]);
-                router.push('/');
+                window.location.href = '/'; // Ensure hard reload here too
             }
         });
 
@@ -197,12 +275,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
 
     const fetchProjects = async () => {
+        // Updated to remove proposal fetching
         const { data, error } = await supabase
             .from('projects')
-            .select(`
-                *,
-                proposals (*)
-            `)
+            .select('*') // No proposals relation anymore
             .order('created_at', { ascending: false });
 
         if (data) {
@@ -210,16 +286,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                 ...p,
                 createdAt: p.created_at,
                 clientId: p.client_id,
-                clientName: p.client_name || 'Anonymous',
+                clientName: 'DownGigs Managed Service', // Mask Client Name from global view (though RLS hides it mostly)
                 flyerUrl: p.flyer_url,
-                // proposals need mapping too
-                proposals: p.proposals.map((prop: any) => ({
-                    ...prop,
-                    developerId: prop.developer_id,
-                    developerName: prop.developer_name || 'Unknown',
-                    developerAvatar: prop.developer_avatar,
-                    coverLetter: prop.cover_letter
-                }))
+                // No proposals needed
             }));
             setProjects(mappedProjects);
         }
@@ -295,9 +364,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
 
     const signOut = async () => {
-        await supabase.auth.signOut();
+        console.log('AppContext: signOut called');
+        const { error } = await supabase.auth.signOut();
+        if (error) console.error('Supabase signOut error:', error);
         setCurrentUser(null);
-        router.push('/');
+        window.location.href = '/'; // Hard reload to clear all state
     };
 
     // --- Feature Actions ---
@@ -372,63 +443,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return { error: null };
     };
 
-    const submitProposal = async (data: { projectId: number; coverLetter: string; amount: number; timeline: string }) => {
-        if (!currentUser) return { error: 'Not logged in' };
-        if (currentUser.status !== 'approved') return { error: 'Your account is pending approval.' };
+    // Old direct actions removed (submitProposal, acceptProposal, createContract)
 
-        const { error } = await supabase.from('proposals').insert([{
-            project_id: data.projectId,
-            developer_id: currentUser.id,
-            developer_name: currentUser.name,
-            developer_avatar: currentUser.avatar,
-            cover_letter: data.coverLetter,
-            amount: data.amount,
-            timeline: data.timeline,
-            status: 'pending'
-        }]);
-
-        if (!error) fetchProjects(); // Refresh to see new proposal count
-        return { error };
-    };
-
-    const acceptProposal = async (proposalId: number, projectId: number) => {
-        // 1. Update Proposal Status
-        const { error: propError } = await supabase
-            .from('proposals')
-            .update({ status: 'accepted' })
-            .eq('id', proposalId);
-
-        if (propError) return { error: propError };
-
-        // 2. Update Project Status
-        const { error: projError } = await supabase
-            .from('projects')
-            .update({ status: 'in_progress' })
-            .eq('id', projectId);
-
-        // 3. Create Contract (Ideally a DB Trigger or backend function)
-        // For now we just refresh
-        fetchProjects();
-        return { error: projError };
-    };
-
-    // --- Placeholders/Partials ---
+    // --- Helpers ---
 
     const getProjectById = (id: number) => {
-        return projects.find(p => p.id === Number(id)); // Parse int just in case
+        return projects.find(p => p.id === Number(id));
     };
 
     const toggleSavedProject = (projectId: number) => {
-        // Implement save logic later (requires saved_projects table)
-        console.log('Toggle save', projectId);
+        console.log('Toggle save (stub)', projectId);
     };
 
     const markNotificationRead = (id: number) => {
         setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-    };
-
-    const createContract = async (proposal: Proposal, project: Project) => {
-        // Placeholder
     };
 
     const scheduleMeeting = async (data: any) => {
@@ -459,9 +487,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                 bio: updates.bio,
                 avatar: updates.avatar,
                 headline: updates.headline,
-                phone: updates.phone,
-                linkedin: updates.linkedin,
-                github: updates.github,
+                // Removed defunct fields
             })
             .eq('id', currentUser.id);
 
@@ -495,20 +521,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             isLoading,
             users,
             projects,
+            tasks,
             messages,
-            contracts,
             notifications,
             transactions,
             meetings,
+            createTask,
+            assignTask,
+            updateTask,
             signIn,
             signOut,
             signUp,
             postProject,
             getProjectById,
-            submitProposal,
-            acceptProposal,
             sendMessage,
-            createContract,
             toggleSavedProject,
             markNotificationRead,
             scheduleMeeting,

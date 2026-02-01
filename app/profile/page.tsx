@@ -48,6 +48,10 @@ export default function ProfilePage() {
         location: ''
     });
 
+    const [updateError, setUpdateError] = useState('');
+    const [updateSuccess, setUpdateSuccess] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+
     useEffect(() => {
         if (!isLoading) {
             if (!currentUser) {
@@ -76,9 +80,7 @@ export default function ProfilePage() {
         }
     };
 
-    const [updateError, setUpdateError] = useState('');
-    const [updateSuccess, setUpdateSuccess] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

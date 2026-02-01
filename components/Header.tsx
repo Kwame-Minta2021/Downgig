@@ -29,7 +29,7 @@ export default function Header() {
 
     const handleSignOut = async () => {
         await signOut();
-        router.push('/');
+        // AppContext handles redirect
     };
 
     return (
@@ -190,6 +190,7 @@ export default function Header() {
                                     <div className="mt-auto pt-8 border-t border-slate-100">
                                         <Button
                                             onClick={() => {
+                                                console.log('Mobile Menu: Sign Out clicked');
                                                 handleSignOut();
                                                 setMobileMenuOpen(false);
                                             }}

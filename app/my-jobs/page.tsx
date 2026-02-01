@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 
 export default function MyJobsPage() {
     const router = useRouter();
-    const { currentUser, contracts } = useApp();
+    const { currentUser, projects, tasks } = useApp();
 
     useEffect(() => {
         if (!currentUser) router.push('/login');
@@ -19,13 +19,14 @@ export default function MyJobsPage() {
 
     if (!currentUser) return null;
 
-    // Filter contracts involving the current user
-    const myContracts = contracts.filter(c =>
-        c.clientId === currentUser.id || c.developerId === currentUser.id
-    );
+    // Derived State based on Role
+    const myProjects = currentUser.role === 'client'
+        ? projects.filter(p => p.clientId === currentUser.id)
+        : [];
 
-    const activeContracts = myContracts.filter(c => c.status === 'active');
-    const completedContracts = myContracts.filter(c => c.status === 'completed');
+    const myTasks = currentUser.role === 'developer'
+        ? tasks.filter(t => t.assigneeId === currentUser.id)
+        : [];
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -33,99 +34,88 @@ export default function MyJobsPage() {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-serif font-bold text-slate-900">My Jobs</h1>
+                    <h1 className="text-3xl font-serif font-bold text-slate-900">
+                        {currentUser.role === 'client' ? 'My Project Requests' : 'My Assigned Tasks'}
+                    </h1>
                     {currentUser.role === 'client' && (
                         <Link href="/projects/new">
-                            <Button variant="primary" className="shadow-lg shadow-blue-500/20">
-                                Post New Job
+                            <Button className="bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold rounded-lg shadow-lg shadow-amber-500/20">
+                                Start New Project
                             </Button>
                         </Link>
                     )}
                 </div>
 
-                {/* Active Contracts Section */}
-                <section className="mb-12">
-                    <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                        <Clock className="w-5 h-5 text-blue-500" />
-                        Active Contracts ({activeContracts.length})
-                    </h2>
-
-                    {activeContracts.length > 0 ? (
-                        <div className="space-y-4">
-                            {activeContracts.map(contract => (
-                                <Card key={contract.id} className="flex flex-col md:flex-row justify-between items-center gap-6 border-l-4 border-l-green-500">
-                                    <div className="flex-1">
-                                        <h3 className="text-xl font-bold text-slate-900 mb-1">
-                                            {contract.projectTitle}
-                                        </h3>
-                                        <div className="text-sm text-slate-500 mb-2">
-                                            Hired {new Date(contract.startDate).toLocaleDateString()}
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-sm font-medium text-slate-600">
-                                                {currentUser.role === 'client' ? 'Developer:' : 'Client:'}
+                {/* CLIENT VIEW: Projects */}
+                {currentUser.role === 'client' && (
+                    <section className="space-y-6">
+                        {myProjects.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {myProjects.map(project => (
+                                    <div key={project.id} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${project.status === 'active' ? 'bg-green-100 text-green-700' :
+                                                    project.status === 'requested' ? 'bg-blue-100 text-blue-700' :
+                                                        'bg-slate-100 text-slate-600'
+                                                }`}>
+                                                {project.status}
                                             </span>
-                                            <div className="flex items-center gap-2 bg-slate-100 px-3 py-1 rounded-full">
-                                                <span className="text-sm font-bold text-slate-800">
-                                                    {currentUser.role === 'client' ? contract.developerName : contract.clientName}
-                                                </span>
+                                            <span className="font-mono font-bold text-slate-900">GH₵{project.budget}</span>
+                                        </div>
+                                        <h3 className="font-bold text-lg text-slate-900 mb-2">{project.title}</h3>
+                                        <p className="text-sm text-slate-500 line-clamp-2 mb-4">{project.description}</p>
+                                        <div className="flex justify-between items-center text-xs text-slate-400 border-t border-slate-100 pt-4">
+                                            <span>{project.category}</span>
+                                            <span>{new Date(project.createdAt).toLocaleDateString()}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-24 bg-white rounded-xl border border-dashed border-slate-200">
+                                <h3 className="text-xl font-bold text-slate-900 mb-2">No Active Projects</h3>
+                                <p className="text-slate-500 max-w-md mx-auto mb-6">You haven't posted any projects yet. Start your journey with DownGigs today.</p>
+                                <Link href="/projects/new">
+                                    <Button variant="outline">Create Request</Button>
+                                </Link>
+                            </div>
+                        )}
+                    </section>
+                )}
+
+                {/* DEVELOPER VIEW: Tasks */}
+                {currentUser.role === 'developer' && (
+                    <section className="space-y-6">
+                        {myTasks.length > 0 ? (
+                            <div className="space-y-4">
+                                {myTasks.map(task => (
+                                    <div key={task.id} className="bg-white p-6 rounded-xl border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm hover:border-amber-300 transition-colors">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <h3 className="font-bold text-xl text-slate-900">{task.title}</h3>
+                                                <span className="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs font-bold uppercase rounded">{task.status}</span>
+                                            </div>
+                                            <p className="text-slate-500 text-sm mb-3 max-w-2xl">{task.description}</p>
+                                            <div className="flex items-center gap-4 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'TBD'}</span>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-8 border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-8 w-full md:w-auto mt-4 md:mt-0">
-                                        <div className="text-center">
-                                            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Budget</div>
-                                            <div className="text-xl font-bold text-slate-900">GH₵{contract.amount.toLocaleString()}</div>
-                                        </div>
-                                        <div className="flex flex-col gap-2 w-full md:w-auto">
-                                            <Button variant="secondary" size="sm" className="w-full">
-                                                <MessageSquare className="w-4 h-4 mr-2" /> Message
-                                            </Button>
-                                            <Button variant="primary" size="sm" className="w-full">
-                                                View Contract
-                                            </Button>
+                                        <div className="flex flex-col items-end gap-3 min-w-[140px]">
+                                            <span className="text-2xl font-bold text-slate-900">GH₵{task.budgetPayout}</span>
+                                            <Button size="sm" className="w-full bg-slate-900 text-white">View Details</Button>
                                         </div>
                                     </div>
-                                </Card>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="bg-white rounded-xl border border-dashed border-slate-300 p-12 text-center">
-                            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">📭</div>
-                            <h3 className="text-lg font-bold text-slate-700 mb-2">No active jobs</h3>
-                            <p className="text-slate-500 mb-6">
-                                {currentUser.role === 'client'
-                                    ? "You haven't hired anyone yet. Post a job to get started!"
-                                    : "You don't have any active contracts. Browsing projects to find work."}
-                            </p>
-                            <Link href={currentUser.role === 'client' ? '/projects/new' : '/projects'}>
-                                <Button variant="outline">
-                                    {currentUser.role === 'client' ? 'Post a Job' : 'Browse Projects'}
-                                </Button>
-                            </Link>
-                        </div>
-                    )}
-                </section>
-
-                {/* Completed Contracts History */}
-                {completedContracts.length > 0 && (
-                    <section>
-                        <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                            <CheckCircle className="w-5 h-5 text-emerald-500" />
-                            History
-                        </h2>
-                        <div className="space-y-4 opacity-75 hover:opacity-100 transition-opacity">
-                            {completedContracts.map(contract => (
-                                <div key={contract.id} className="bg-white p-6 rounded-xl border border-slate-200 flex justify-between items-center">
-                                    <div>
-                                        <h3 className="font-bold text-slate-900">{contract.projectTitle}</h3>
-                                        <p className="text-sm text-slate-500">Completed on {new Date().toLocaleDateString()}</p>
-                                    </div>
-                                    <span className="badge badge-completed">Amt: GH₵{contract.amount}</span>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-24 bg-white rounded-xl border border-dashed border-slate-200">
+                                <CheckCircle className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                                <h3 className="text-xl font-bold text-slate-900 mb-2">Task Board Empty</h3>
+                                <p className="text-slate-500 max-w-md mx-auto">
+                                    You have no assigned tasks. Keep your profile updated to increase your chances of selection by our Project Managers.
+                                </p>
+                            </div>
+                        )}
                     </section>
                 )}
             </div>

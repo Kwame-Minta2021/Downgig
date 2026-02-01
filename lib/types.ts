@@ -1,4 +1,4 @@
-export type Role = 'client' | 'developer' | 'admin';
+export type Role = 'client' | 'developer' | 'admin' | 'pm';
 
 export type AcademicLevel = 'Undergraduate' | 'Masters' | 'PhD' | 'Professional';
 
@@ -18,44 +18,38 @@ export interface User {
   name: string;
   email: string;
   role: Role;
-  status?: 'pending' | 'approved' | 'rejected' | 'suspended';
-  avatar?: string; // Emoji char
+  status?: 'onboarding' | 'pending' | 'approved' | 'rejected' | 'suspended';
+  avatar?: string;
   university?: string;
   location?: string;
 
-  // Detailed Info (Onboarding)
+  // Profile
   headline?: string;
-  phone?: string;
-  linkedin?: string;
-  github?: string;
-
-  // Stats
-  projectsPosted?: number;
-  activeProjects?: number;
-  proposalsReceived?: number;
-  completedProjects?: number;
-  proposalsSent?: number;
-  acceptedProposals?: number;
-  successRate?: number;
-  totalEarnings?: number;
-  // Reputation
-  reviews?: Review[];
-  rating?: number; // 0-5
-  // User Preferences
-  savedProjectIds?: number[]; // Projects still use BigInt/number IDs
-  balance?: number;
-  pendingBalance?: number;
   bio?: string;
-  portfolio?: PortfolioItem[];
+  companyName?: string;
+
+  // Managed Developer Network Fields (Internal)
+  internal_rating?: number;
+  hourly_rate?: number;
+  vetting_status?: 'new' | 'interviewing' | 'verified' | 'probation' | 'gold';
+  nda_signed?: boolean;
+  public_alias?: string;
+
+  balance?: number;
   created_at?: string;
   updated_at?: string;
+
+  // For UI display helpers
+  portfolio?: PortfolioItem[];
+  completedProjects?: number;
+  successRate?: number;
 }
 
 export interface PortfolioItem {
   id: number;
   title: string;
   description: string;
-  imageUrls: string[]; // Updated for multiple images
+  imageUrls: string[];
   link?: string;
 }
 
@@ -63,22 +57,11 @@ export interface Message {
   id: number;
   senderId: string; // UUID
   receiverId: string; // UUID
+  projectId?: number;
   content: string;
-  timestamp: string;
   read: boolean;
-}
-
-export interface Contract {
-  id: number;
-  projectId: number;
-  projectTitle: string;
-  clientId: string; // UUID
-  clientName: string;
-  developerId: string; // UUID
-  developerName: string;
-  amount: number;
-  startDate: string;
-  status: 'active' | 'completed' | 'terminated';
+  isInternal?: boolean;
+  timestamp: string;
 }
 
 export interface Meeting {
@@ -91,23 +74,13 @@ export interface Meeting {
   startTime: string; // ISO string
   durationMinutes: number;
   status: 'scheduled' | 'completed' | 'cancelled';
-  link?: string; // e.g., Google Meet link
-}
-
-export interface Review {
-  id: number;
-  reviewerId: string; // UUID
-  reviewerName: string;
-  rating: number; // 1-5
-  comment: string;
-  date: string;
-  projectId: number;
+  link?: string;
 }
 
 export interface Notification {
   id: number;
   userId: string; // UUID
-  type: 'message' | 'proposal' | 'contract' | 'system';
+  type: 'message' | 'task' | 'system';
   content: string;
   link?: string;
   read: boolean;
@@ -118,52 +91,65 @@ export interface Transaction {
   id: number;
   userId: string; // UUID
   type: 'credit' | 'debit';
+  category: 'deposit' | 'payout' | 'refund' | 'fee';
   amount: number;
   description: string;
   date: string;
   status: 'completed' | 'pending';
+  reference?: string;
 }
 
-export interface Proposal {
-  id: number;
-  developerId: string; // UUID
-  developerName: string;
-  developerAvatar: string;
-  coverLetter: string;
-  amount: number;
-  timeline: string;
-  status: 'pending' | 'accepted' | 'rejected';
-}
-
+// Client Facing Project
 export interface Project {
   id: number;
+  clientId: string; // UUID
+  clientName?: string; // Mapped for UI
+  managerId?: string; // Assigned Admin
+
   title: string;
   description: string;
   requirements: string;
-  budget: number;
+
+  budget: number; // Client Budget
   timeline: string;
   level: AcademicLevel;
   category: ProjectCategory;
   skills: string[];
   urgent: boolean;
-  status: 'open' | 'in_progress' | 'completed' | 'pending_approval' | 'rejected';
+
+  status: 'requested' | 'scoping' | 'active' | 'review' | 'completed' | 'cancelled';
+  flyerUrl?: string;
+  location?: string;
+
   createdAt: string;
-
-  // Client info
-  clientId: string; // UUID
-  clientName: string;
-  university?: string;
-
-  // Proposals
-  proposals: Proposal[];
-
-  // New Fields
-  flyerUrl?: string; // Optional URL for flyer
-  location?: string; // Optional preferred location
 }
 
-// ... existing code ...
+// Internal Work Unit
+export interface Task {
+  id: number;
+  projectId: number;
+  assigneeId?: string; // Developer UUID
 
+  title: string;
+  description: string; // Technical Instructions
+  status: 'open' | 'assigned' | 'in_progress' | 'qa_ready' | 'completed' | 'blocked';
+
+  budgetPayout: number; // Developer Pay
+  dueDate?: string;
+
+  createdAt: string;
+}
+
+export interface QALog {
+  id: number;
+  taskId: number;
+  reviewerId: string;
+  status: 'pass' | 'fail' | 'warning';
+  notes: string;
+  createdAt: string;
+}
+
+// Form Data Helpers
 export interface ProjectFormData {
   title: string;
   level: string;
@@ -174,15 +160,6 @@ export interface ProjectFormData {
   timeline: string;
   skills: string;
   urgent: boolean;
-
-  // New Fields
   location: string;
-  flyer: File | null; // For handling file upload in state
-}
-
-export interface FilterState {
-  level: string;
-  category: string;
-  budget: string;
-  status: string;
+  flyer: File | null;
 }

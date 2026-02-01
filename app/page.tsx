@@ -60,37 +60,31 @@ export default function HomePage() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h1 className="text-4xl md:text-7xl lg:text-8xl font-serif font-bold text-white tracking-tight mb-6 md:mb-8 leading-tight">
-              Elite Talent. <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200">Instant Access.</span>
+              Engineering Delivered. <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200">Not Just Promised.</span>
             </h1>
             <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed font-light">
-              Connect with the world's most capable academic developers. <br className="hidden md:block" />
-              A marketplace redefined for excellence.
+              We don't just find you developers—we build your software. DownGigs recruits, manages, and guarantees the work of top technical talent so you can focus on growing your business.
             </p>
           </motion.div>
 
-          {/* Search Bar */}
-          <motion.form
-            onSubmit={handleSearch}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="max-w-3xl mx-auto bg-white/10 backdrop-blur-md rounded-full p-2 flex shadow-2xl shadow-black/20 mb-12 border border-white/10"
+            className="flex flex-col sm:flex-row justify-center gap-4 mb-12"
           >
-            <div className="flex-1 flex items-center px-4 md:px-6">
-              <Search className="w-6 h-6 text-amber-500 mr-3" />
-              <input
-                type="text"
-                placeholder="Find experts in..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-transparent border-none focus:ring-0 text-white placeholder-slate-400 text-lg font-medium"
-              />
-            </div>
-            <Button size="lg" className="rounded-full px-8 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold border-none transition-all hover:scale-105 active:scale-95">
-              Search
-            </Button>
-          </motion.form>
+            <Link href="/projects/new">
+              <Button size="lg" className="rounded-full px-8 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold border-none transition-all hover:scale-105 active:scale-95 text-lg h-14 w-full sm:w-auto">
+                Start a Project
+              </Button>
+            </Link>
+            <Link href="/signup">
+              <Button size="lg" variant="outline" className="rounded-full px-8 border-white/20 text-white hover:bg-white/10 font-bold transition-all hover:scale-105 active:scale-95 text-lg h-14 w-full sm:w-auto backdrop-blur-sm">
+                Join Delivery Network
+              </Button>
+            </Link>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0 }}
@@ -98,12 +92,12 @@ export default function HomePage() {
             transition={{ delay: 0.4 }}
             className="flex flex-wrap justify-center gap-6 text-sm text-slate-500 font-medium uppercase tracking-widest"
           >
-            <span>Trusted By Leaders In</span>
-            <span className="text-slate-300">Tech</span>
+            <span>Managed Delivery For</span>
+            <span className="text-slate-300">Startups</span>
             <span className="text-slate-600">•</span>
-            <span className="text-slate-300">Finance</span>
+            <span className="text-slate-300">SMEs</span>
             <span className="text-slate-600">•</span>
-            <span className="text-slate-300">Research</span>
+            <span className="text-slate-300">Enterprise</span>
           </motion.div>
         </div>
       </section>
@@ -111,19 +105,17 @@ export default function HomePage() {
       {/* Category Carousel Section */}
       <section className="py-24 max-w-7xl mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-4">Curated Categories</h2>
-          <p className="text-slate-500 text-lg">Precision-matched expertise for every domain.</p>
+          <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-4">Comprehensive Technical Capabilities</h2>
+          <p className="text-slate-500 text-lg">Scalable solutions across every domain.</p>
         </div>
 
         <CategoriesCarousel categories={[
-          { name: 'Development', icon: <Code className="w-8 h-8" />, color: "text-blue-500" },
-          { name: 'AI Services', icon: <Zap className="w-8 h-8" />, color: "text-amber-500" },
-          { name: 'Design', icon: <PenTool className="w-8 h-8" />, color: "text-rose-500" },
-          { name: 'Business', icon: <ArrowRight className="w-8 h-8" />, color: "text-emerald-500" },
-          { name: 'Admin', icon: <UserCheck className="w-8 h-8" />, color: "text-indigo-500" },
-          { name: 'Legal', icon: <Shield className="w-8 h-8" />, color: "text-slate-500" },
-          { name: 'Web3', icon: <Globe className="w-8 h-8" />, color: "text-cyan-500" },
-          { name: 'Finance', icon: <DollarSign className="w-8 h-8" />, color: "text-green-600" },
+          { name: 'Web Dev', icon: <Code className="w-8 h-8" />, color: "text-blue-500" },
+          { name: 'Mobile Apps', icon: <Zap className="w-8 h-8" />, color: "text-amber-500" },
+          { name: 'Backend & API', icon: <Globe className="w-8 h-8" />, color: "text-rose-500" },
+          { name: 'UI/UX Design', icon: <PenTool className="w-8 h-8" />, color: "text-emerald-500" },
+          { name: 'Data & Auto', icon: <ClipboardList className="w-8 h-8" />, color: "text-indigo-500" },
+          { name: 'Maintenance', icon: <Shield className="w-8 h-8" />, color: "text-slate-500" },
         ]} />
       </section>
 
@@ -133,9 +125,9 @@ export default function HomePage() {
 
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center relative z-10">
           <div>
-            <span className="text-amber-500 font-bold tracking-wider uppercase mb-2 block text-sm">The DownGigs Standard</span>
+            <span className="text-amber-500 font-bold tracking-wider uppercase mb-2 block text-sm">The Managed Difference</span>
             <h2 className="text-4xl font-serif font-bold text-slate-900 mb-8 leading-tight">
-              Why businesses turn to DownGigs
+              Why businesses choose Managed Delivery
             </h2>
             <div className="space-y-10">
               <div className="flex gap-6">
@@ -143,17 +135,8 @@ export default function HomePage() {
                   <Award className="w-7 h-7 text-amber-400" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Vetted for Brilliance</h3>
-                  <p className="text-slate-600 leading-relaxed">We verify every credential. You hire only the top 1% of academic talent, pre-screened for your needs.</p>
-                </div>
-              </div>
-              <div className="flex gap-6">
-                <div className="w-14 h-14 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-sm">
-                  <Shield className="w-7 h-7 text-slate-900" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Ironclad Security</h3>
-                  <p className="text-slate-600 leading-relaxed">Enterprise-grade protection for your data and payments. Your peace of mind is our priority.</p>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">End-to-End Management</h3>
+                  <p className="text-slate-600 leading-relaxed">We scope, assign, and manage the work. You get the results. No more herding freelancers.</p>
                 </div>
               </div>
               <div className="flex gap-6">
@@ -161,8 +144,17 @@ export default function HomePage() {
                   <CheckCircle className="w-7 h-7 text-slate-900" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Satisfaction Guaranteed</h3>
-                  <p className="text-slate-600 leading-relaxed">Funds are only released when you are 100% satisfied with the work delivered.</p>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Vetted Technical Excellence</h3>
+                  <p className="text-slate-600 leading-relaxed">Access a private network of skilled developers, fully tested and backed by our quality assurance.</p>
+                </div>
+              </div>
+              <div className="flex gap-6">
+                <div className="w-14 h-14 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-sm">
+                  <Shield className="w-7 h-7 text-slate-900" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Zero Overhead</h3>
+                  <p className="text-slate-600 leading-relaxed">No interviewing, no payroll, no direct management. Just specify your needs, and we deliver.</p>
                 </div>
               </div>
             </div>
@@ -170,47 +162,37 @@ export default function HomePage() {
           <div className="relative">
             <div className="absolute inset-0 bg-amber-400 rounded-[2rem] rotate-3 opacity-20 blur-xl"></div>
             <img
-              src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=2070&auto=format&fit=crop"
-              alt="Premium Collaboration"
+              src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop"
+              alt="Managed Team"
               className="relative rounded-[2rem] shadow-2xl -rotate-2 hover:rotate-0 transition-transform duration-700 border-4 border-white"
             />
           </div>
         </div>
       </section>
 
-      {/* Recent Projects Section */}
-      <section className="max-w-7xl mx-auto px-4 py-16 md:py-24">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-12 md:mb-16">
-          <div>
-            <h2 className="text-4xl font-serif font-bold mb-4 text-slate-900">Featured Opportunities</h2>
-            <p className="text-xl text-slate-500">The latest high-value projects.</p>
-          </div>
-          <Link href="/projects" className="hidden md:inline-flex items-center font-bold text-amber-600 hover:text-amber-700 border-b-2 border-transparent hover:border-amber-600 transition-all">
-            View All Projects
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Link>
+      {/* How It Works Section - New */}
+      <section className="py-24 max-w-7xl mx-auto px-4 bg-slate-50">
+        <div className="text-center mb-16">
+          <span className="text-amber-600 font-bold uppercase tracking-wider text-sm mb-2 block">The Process</span>
+          <h2 className="text-4xl font-serif font-bold text-slate-900">Your Vision, Our Execution</h2>
         </div>
 
-        {recentProjects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {recentProjects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-24 bg-white rounded-3xl border border-dashed border-slate-200">
-            <div className="flex justify-center mb-6">
-              <ClipboardList className="w-16 h-16 text-slate-300" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {[
+            { step: '01', title: 'Submit Request', desc: 'Tell us what you need. Whether it\'s a new feature or full app.' },
+            { step: '02', title: 'Scoping & Plan', desc: 'Our PMs review requirements and define a clear scope and budget.' },
+            { step: '03', title: 'Development', desc: 'We assign the best-fit talent. Work begins immediately.' },
+            { step: '04', title: 'Review & Launch', desc: 'You review the final deliverables. We deploy upon approval.' }
+          ].map((item, i) => (
+            <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow relative overflow-hidden group">
+              <span className="text-6xl font-black text-slate-100 absolute -top-2 -right-2 group-hover:text-amber-50 transition-colors">{item.step}</span>
+              <div className="relative z-10">
+                <h3 className="font-bold text-xl text-slate-900 mb-3">{item.title}</h3>
+                <p className="text-slate-500 leading-relaxed">{item.desc}</p>
+              </div>
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-2">No active projects</h3>
-            <p className="text-slate-500 mb-8">Be the first to post a new opportunity.</p>
-            <Link href="/projects/new">
-              <Button size="lg" className="bg-slate-900 text-white hover:bg-slate-800 rounded-full px-8">
-                Post a Project
-              </Button>
-            </Link>
-          </div>
-        )}
+          ))}
+        </div>
       </section>
 
       {/* CTA Footer - Premium Dark */}
@@ -219,26 +201,26 @@ export default function HomePage() {
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent"></div>
 
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10 text-white">
-          <h2 className="text-5xl font-serif font-bold mb-8">Transform your workflow.</h2>
+          <h2 className="text-5xl font-serif font-bold mb-8">Ready to build?</h2>
           <p className="text-xl text-slate-300 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Join the elite network of professionals who have chosen DownGigs.
+            Stop gambling on gig marketplaces. Partner with a managed delivery network.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Link href="/signup">
+            <Link href="/projects/new">
               <Button size="lg" className="bg-amber-500 text-slate-900 hover:bg-amber-400 border-none shadow-xl shadow-amber-900/20 px-10 h-14 text-lg font-bold rounded-full">
-                Get Started
+                Start a New Project
               </Button>
             </Link>
-            <Link href="/projects">
+            <Link href="/signup">
               <Button size="lg" variant="outline" className="border-slate-700 text-white hover:bg-white/5 px-10 h-14 text-lg font-medium rounded-full">
-                Browse Talent
+                Developer Application
               </Button>
             </Link>
           </div>
         </div>
       </section>
-
-      {/* Footer Links - Removed (Using Global Footer) */}
     </div>
   );
 }
+
+

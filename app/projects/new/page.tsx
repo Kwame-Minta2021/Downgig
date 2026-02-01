@@ -13,15 +13,14 @@ export default function NewProjectPage() {
     const { postProject, currentUser, uploadImage } = useApp();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Redirect if not logged in
+    // Redirect if not logged in or not client
     useEffect(() => {
-        if (!currentUser) router.push('/login');
+        if (!currentUser) {
+            router.push('/login');
+        } else if (currentUser.role !== 'client') {
+            router.push('/dashboard');
+        }
     }, [currentUser, router]);
-
-    // Redirect if not client
-    if (currentUser && currentUser.role !== 'client') {
-        router.push('/dashboard');
-    }
 
     const [formData, setFormData] = useState<ProjectFormData>({
         title: '',
@@ -309,8 +308,8 @@ export default function NewProjectPage() {
                                 </label>
                                 <div
                                     className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all ${dragActive
-                                            ? 'border-blue-500 bg-blue-50'
-                                            : 'border-slate-300 hover:border-blue-400 hover:bg-slate-50'
+                                        ? 'border-blue-500 bg-blue-50'
+                                        : 'border-slate-300 hover:border-blue-400 hover:bg-slate-50'
                                         }`}
                                     onDragEnter={handleDrag}
                                     onDragLeave={handleDrag}

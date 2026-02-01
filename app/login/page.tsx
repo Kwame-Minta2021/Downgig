@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useApp } from '@/contexts/AppContext';
@@ -10,10 +10,16 @@ import { motion } from 'framer-motion';
 
 export default function LoginPage() {
     const router = useRouter();
-    const { signIn } = useApp();
+    const { signIn, currentUser } = useApp();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        if (currentUser) {
+            router.push('/dashboard');
+        }
+    }, [currentUser, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
