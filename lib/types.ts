@@ -43,6 +43,11 @@ export interface User {
   updated_at?: string;
 
   // For UI display helpers
+  portfolio?: PortfolioItem[];
+  completedProjects?: number;
+  acceptedProposals?: number;
+  totalEarnings?: number;
+  successRate?: number;
   link?: string;
   reviews?: Review[];
 }
