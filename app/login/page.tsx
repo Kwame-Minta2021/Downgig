@@ -23,10 +23,13 @@ export default function LoginPage() {
         if (!error) {
             router.push('/dashboard');
         } else {
+            console.error('Login error:', error);
             if (error.message.includes('Invalid login credentials')) {
-                setError('Invalid email or password. Have you created an account?');
+                setError('Invalid email or password. Please check your credentials.');
+            } else if (error.message.includes('Email not confirmed')) {
+                setError('Please verify your email address before logging in. Check your inbox (and spam folder) for the confirmation link.');
             } else {
-                setError(error.message || 'Failed to sign in.');
+                setError(error.message || 'Failed to sign in. Please try again.');
             }
         }
     };

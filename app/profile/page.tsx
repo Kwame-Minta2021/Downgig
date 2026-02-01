@@ -76,10 +76,17 @@ export default function ProfilePage() {
         }
     };
 
+    const [updateError, setUpdateError] = useState('');
+    const [updateSuccess, setUpdateSuccess] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setUpdateError('');
+        setUpdateSuccess(false);
+        setIsSaving(true);
 
-        await updateProfile({
+        const { error } = await updateProfile({
             name: formData.name,
             email: formData.email,
             university: formData.university,
@@ -87,8 +94,18 @@ export default function ProfilePage() {
             location: formData.location
         });
 
-        setActiveTab('overview');
-        // Optional: Add a toast notification here
+        setIsSaving(false);
+
+        if (error) {
+            setUpdateError('Failed to update profile. Please try again.');
+            console.error(error);
+        } else {
+            setUpdateSuccess(true);
+            setTimeout(() => {
+                setUpdateSuccess(false);
+                setActiveTab('overview');
+            }, 1000);
+        }
     };
 
     return (
@@ -400,8 +417,20 @@ export default function ProfilePage() {
                                             <input type="text" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all" value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} placeholder="e.g. Accra, Ghana" />
                                         </div>
                                     </div>
+                                    {updateError && (
+                                        <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100 col-span-2">
+                                            {updateError}
+                                        </div>
+                                    )}
+                                    {updateSuccess && (
+                                        <div className="p-3 bg-green-50 text-green-600 rounded-lg text-sm border border-green-100 col-span-2">
+                                            Profile updated successfully!
+                                        </div>
+                                    )}
                                     <div className="flex justify-end pt-6 border-t border-slate-100">
-                                        <Button type="submit">Save Changes</Button>
+                                        <Button type="submit" disabled={isSaving}>
+                                            {isSaving ? 'Saving...' : 'Save Changes'}
+                                        </Button>
                                     </div>
                                 </form>
                             </motion.div>

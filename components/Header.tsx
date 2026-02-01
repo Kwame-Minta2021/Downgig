@@ -14,20 +14,23 @@ export default function Header() {
     const router = useRouter();
     const pathname = usePathname();
     const { currentUser, signOut } = useApp();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
-        const handleScroll = () => setScrolled(window.scrollY > 20);
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 10);
+        };
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const handleSignOut = () => {
-        signOut();
-        router.push('/login');
-    };
-
     const isActive = (path: string) => pathname === path;
+
+    const handleSignOut = async () => {
+        await signOut();
+        router.push('/');
+    };
 
     return (
         <header
@@ -37,11 +40,11 @@ export default function Header() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-20">
                     {/* Logo */}
-                    <Link href="/" className="flex-shrink-0 hover:opacity-80 transition-opacity">
+                    <Link href="/" className="flex-shrink-0 hover:opacity-80 transition-opacity z-50">
                         <Logo className="w-10 h-10" textClassName="text-2xl" />
                     </Link>
 
-                    {/* Navigation */}
+                    {/* Desktop Navigation */}
                     {currentUser ? (
                         <nav className="hidden md:flex items-center gap-1 bg-slate-100/50 p-1.5 rounded-2xl backdrop-blur-sm border border-slate-200/50">
                             <NavLink href="/projects" active={isActive('/projects')}>Browse</NavLink>
@@ -66,13 +69,11 @@ export default function Header() {
                         </nav>
                     )}
 
-                    {/* User Actions */}
-                    <div className="flex items-center gap-4">
+                    {/* Desktop User Actions */}
+                    <div className="hidden md:flex items-center gap-4">
                         {currentUser ? (
                             <div className="flex items-center gap-4">
-                                {/* Notifications Bell */}
                                 <NotificationDropdown />
-
                                 <Link href="/profile" className="flex items-center gap-3 group px-3 py-1.5 rounded-xl hover:bg-slate-50 transition-colors">
                                     <div className="text-right hidden sm:block">
                                         <p className="text-sm font-bold text-slate-900 leading-none">{currentUser.name}</p>
@@ -102,9 +103,143 @@ export default function Header() {
                             </div>
                         )}
                     </div>
+
+                    {/* Mobile Menu Toggle */}
+                    <div className="flex md:hidden items-center gap-4">
+                        {currentUser && <NotificationDropdown />}
+                        <button
+                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            className="p-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors z-50 relative"
+                        >
+                            <div className="w-6 h-5 flex flex-col justify-between">
+                                <motion.span
+                                    animate={mobileMenuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
+                                    className="w-full h-0.5 bg-current rounded-full origin-center"
+                                />
+                                <motion.span
+                                    animate={mobileMenuOpen ? { opacity: 0 } : { opacity: 1 }}
+                                    className="w-full h-0.5 bg-current rounded-full"
+                                />
+                                <motion.span
+                                    animate={mobileMenuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
+                                    className="w-full h-0.5 bg-current rounded-full origin-center"
+                                />
+                            </div>
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            {/* Mobile Menu Drawer */}
+            <AnimatePresence>
+                {mobileMenuOpen && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40 md:hidden"
+                            onClick={() => setMobileMenuOpen(false)}
+                        />
+                        <motion.div
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+                            className="fixed right-0 top-0 bottom-0 w-[80%] max-w-sm bg-white shadow-2xl z-50 md:hidden flex flex-col pt-24 pb-8 px-6 overflow-y-auto"
+                        >
+                            {/* Mobile User Info */}
+                            {currentUser ? (
+                                <div className="flex flex-col gap-6 mb-8">
+                                    <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <UserAvatar user={currentUser} size="lg" />
+                                        <div>
+                                            <p className="font-bold text-slate-900 text-lg">{currentUser.name}</p>
+                                            <p className="text-sm text-slate-500 capitalize">{currentUser.role === 'client' ? 'Client' : 'Developer'}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col gap-2">
+                                        <MobileNavLink href="/profile" active={isActive('/profile')} onClick={() => setMobileMenuOpen(false)}>
+                                            My Profile
+                                        </MobileNavLink>
+                                        <MobileNavLink href="/projects" active={isActive('/projects')} onClick={() => setMobileMenuOpen(false)}>
+                                            Browse Projects
+                                        </MobileNavLink>
+                                        {currentUser.role === 'client' && (
+                                            <MobileNavLink href="/projects/new" active={isActive('/projects/new')} onClick={() => setMobileMenuOpen(false)}>
+                                                Post Project
+                                            </MobileNavLink>
+                                        )}
+                                        {currentUser.role === 'admin' && (
+                                            <MobileNavLink href="/admin" active={isActive('/admin')} onClick={() => setMobileMenuOpen(false)}>
+                                                Admin Dashboard
+                                            </MobileNavLink>
+                                        )}
+                                        <MobileNavLink href="/my-jobs" active={isActive('/my-jobs')} onClick={() => setMobileMenuOpen(false)}>
+                                            My Jobs
+                                        </MobileNavLink>
+                                        <MobileNavLink href="/messages" active={isActive('/messages')} onClick={() => setMobileMenuOpen(false)}>
+                                            Messages
+                                        </MobileNavLink>
+                                        <MobileNavLink href="/saved-jobs" active={isActive('/saved-jobs')} onClick={() => setMobileMenuOpen(false)}>
+                                            Saved Jobs
+                                        </MobileNavLink>
+                                    </div>
+
+                                    <div className="mt-auto pt-8 border-t border-slate-100">
+                                        <Button
+                                            onClick={() => {
+                                                handleSignOut();
+                                                setMobileMenuOpen(false);
+                                            }}
+                                            variant="ghost"
+                                            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                                        >
+                                            Sign Out
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col gap-4">
+                                    <div className="space-y-4 mb-8">
+                                        <MobileNavLink href="/about" active={isActive('/about')} onClick={() => setMobileMenuOpen(false)}>
+                                            How it Works
+                                        </MobileNavLink>
+                                        <MobileNavLink href="/developers" active={isActive('/developers')} onClick={() => setMobileMenuOpen(false)}>
+                                            Find Talent
+                                        </MobileNavLink>
+                                    </div>
+                                    <div className=" pt-8 border-t border-slate-100 flex flex-col gap-4">
+                                        <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                                            <Button variant="ghost" size="lg" className="w-full justify-start">Log In</Button>
+                                        </Link>
+                                        <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
+                                            <Button variant="primary" size="lg" className="w-full shadow-lg shadow-blue-500/25">Get Started</Button>
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
         </header>
+    );
+}
+
+function MobileNavLink({ href, active, children, onClick }: { href: string; active: boolean; children: React.ReactNode, onClick: () => void }) {
+    return (
+        <Link
+            href={href}
+            onClick={onClick}
+            className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${active
+                ? 'bg-blue-50 text-blue-600'
+                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+        >
+            {children}
+        </Link>
     );
 }
 

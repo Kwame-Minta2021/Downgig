@@ -47,7 +47,7 @@ export default function CategoriesCarousel({ categories }: { categories: Categor
     }, [categories.length, visibleItems]);
 
     return (
-        <div className="relative group px-12">
+        <div className="relative group px-4 md:px-12">
             <button
                 onClick={prevSlide}
                 className="absolute left-0 top-1/2 -translate-y-1/2 p-3 bg-white rounded-full shadow-lg border border-slate-100 text-slate-400 hover:text-amber-600 hover:scale-110 transition-all z-10 disabled:opacity-50"

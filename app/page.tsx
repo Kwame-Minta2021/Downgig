@@ -48,7 +48,7 @@ export default function HomePage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative bg-slate-950 pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden rounded-b-[4rem]">
+      <section className="relative bg-slate-950 pt-24 pb-16 lg:pt-40 lg:pb-32 overflow-hidden rounded-b-[2rem] md:rounded-b-[4rem]">
         {/* Slideshow Background */}
         <BackgroundSlideshow images={slideImages} duration={6} />
 
@@ -59,12 +59,12 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold text-white tracking-tight mb-8 leading-tight">
+            <h1 className="text-4xl md:text-7xl lg:text-8xl font-serif font-bold text-white tracking-tight mb-6 md:mb-8 leading-tight">
               Elite Talent. <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200">Instant Access.</span>
             </h1>
-            <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed font-light">
-              Connect with the world's most capable academic developers. <br />
+            <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed font-light">
+              Connect with the world's most capable academic developers. <br className="hidden md:block" />
               A marketplace redefined for excellence.
             </p>
           </motion.div>
@@ -77,7 +77,7 @@ export default function HomePage() {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="max-w-3xl mx-auto bg-white/10 backdrop-blur-md rounded-full p-2 flex shadow-2xl shadow-black/20 mb-12 border border-white/10"
           >
-            <div className="flex-1 flex items-center px-6">
+            <div className="flex-1 flex items-center px-4 md:px-6">
               <Search className="w-6 h-6 text-amber-500 mr-3" />
               <input
                 type="text"
@@ -179,8 +179,8 @@ export default function HomePage() {
       </section>
 
       {/* Recent Projects Section */}
-      <section className="max-w-7xl mx-auto px-4 py-24">
-        <div className="flex justify-between items-end mb-16">
+      <section className="max-w-7xl mx-auto px-4 py-16 md:py-24">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-12 md:mb-16">
           <div>
             <h2 className="text-4xl font-serif font-bold mb-4 text-slate-900">Featured Opportunities</h2>
             <p className="text-xl text-slate-500">The latest high-value projects.</p>

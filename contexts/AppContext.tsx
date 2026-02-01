@@ -33,7 +33,7 @@ interface AppContextType {
     markNotificationRead: (id: number) => void;
     scheduleMeeting: (data: any) => Promise<void>;
     addPortfolioItem: (item: any) => Promise<void>;
-    updateProfile: (updates: Partial<User>) => Promise<void>;
+    updateProfile: (updates: Partial<User>) => Promise<{ error: any }>;
     uploadImage: (file: File, folder?: string) => Promise<string>;
 
     // Global User List (for demo/messaging)
@@ -448,7 +448,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
 
     const updateProfile = async (updates: Partial<User>) => {
-        if (!currentUser) return;
+        if (!currentUser) return { error: 'Not logged in' };
 
         const { error } = await supabase
             .from('profiles')
@@ -468,6 +468,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (!error) {
             await fetchUserProfile(currentUser.id);
         }
+        return { error };
     };
 
     const uploadImage = async (file: File, folder: string = 'uploads') => {

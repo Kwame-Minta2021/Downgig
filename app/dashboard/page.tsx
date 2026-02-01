@@ -30,8 +30,10 @@ function ClientDashboard() {
 
     // Stats for Client
     const myProjects = projects.filter(p => p.clientName === currentUser?.name);
+    const completedOrActive = myProjects.filter(p => ['in_progress', 'completed'].includes(p.status));
     const activeProjects = myProjects.filter(p => p.status === 'open').length;
-    const totalSpent = 0; // Placeholder for now
+    const totalSpent = completedOrActive.reduce((sum, p) => sum + p.budget, 0);
+    const totalHires = completedOrActive.length;
 
     return (
         <div className="space-y-8">
@@ -65,13 +67,13 @@ function ClientDashboard() {
                 <StatCard
                     icon={<Users className="w-6 h-6" />}
                     label="Total Hires"
-                    value={0}
+                    value={totalHires}
                     color="green"
                 />
                 <StatCard
                     icon={<DollarSign className="w-6 h-6" />}
                     label="Total Spent"
-                    value={`GH₵ ${totalSpent}`}
+                    value={`GH₵ ${totalSpent.toLocaleString()}`}
                     color="amber"
                 />
             </div>
@@ -136,7 +138,12 @@ function DeveloperDashboard() {
 
     // Stats for Developer
     const availableProjects = projects.filter(p => p.status === 'open').length;
-    const myApplications = 0; // Placeholder
+    // Calculate applications from all projects' proposals
+    const myApplications = projects.reduce((acc, project) => {
+        const hasApplied = project.proposals?.some(p => p.developerId === currentUser?.id);
+        return acc + (hasApplied ? 1 : 0);
+    }, 0);
+
     const earnings = currentUser?.balance || 0;
 
     return (
