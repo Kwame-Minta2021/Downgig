@@ -46,6 +46,7 @@ export interface User {
   portfolio?: PortfolioItem[];
   completedProjects?: number;
   acceptedProposals?: number;
+  totalEarnings?: number; // Added for Developers Directory
   successRate?: number;
 }
 
