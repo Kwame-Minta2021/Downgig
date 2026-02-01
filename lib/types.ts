@@ -48,6 +48,9 @@ export interface User {
   acceptedProposals?: number;
   totalEarnings?: number;
   successRate?: number;
+  rating?: number; // Added for ProfilePage
+  projectsPosted?: number; // Added for ProfilePage
+  proposalsSent?: number; // Added for ProfilePage
   link?: string;
   reviews?: Review[];
 }
