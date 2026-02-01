@@ -81,10 +81,6 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <div className="text-right">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Proposals</span>
-                            <span className="text-sm font-bold text-slate-700">{project.proposals.length}</span>
-                        </div>
                         <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 ml-2">
                             <ChevronRight className="w-4 h-4" />
                         </div>
