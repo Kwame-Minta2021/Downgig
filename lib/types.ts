@@ -27,6 +27,9 @@ export interface User {
   headline?: string;
   bio?: string;
   companyName?: string;
+  phone?: string;
+  linkedin?: string;
+  github?: string;
 
   // Managed Developer Network Fields (Internal)
   internal_rating?: number;
