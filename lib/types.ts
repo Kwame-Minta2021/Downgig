@@ -45,6 +45,7 @@ export interface User {
   // For UI display helpers
   portfolio?: PortfolioItem[];
   completedProjects?: number;
+  acceptedProposals?: number;
   successRate?: number;
 }
 
