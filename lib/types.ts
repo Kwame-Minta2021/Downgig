@@ -43,11 +43,8 @@ export interface User {
   updated_at?: string;
 
   // For UI display helpers
-  portfolio?: PortfolioItem[];
-  completedProjects?: number;
-  acceptedProposals?: number;
-  totalEarnings?: number; // Added for Developers Directory
-  successRate?: number;
+  link?: string;
+  reviews?: Review[];
 }
 
 export interface PortfolioItem {
@@ -56,6 +53,16 @@ export interface PortfolioItem {
   description: string;
   imageUrls: string[];
   link?: string;
+}
+
+export interface Review {
+  id: number;
+  reviewerName: string;
+  rating: number;
+  comment: string;
+  date: string;
+  user_id?: string; // Who was reviewed
+  reviewer_id?: string; // Who wrote it
 }
 
 export interface Message {
