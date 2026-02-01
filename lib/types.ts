@@ -51,6 +51,7 @@ export interface User {
   rating?: number; // Added for ProfilePage
   projectsPosted?: number; // Added for ProfilePage
   proposalsSent?: number; // Added for ProfilePage
+  savedProjectIds?: number[]; // Added for SavedJobsPage
   link?: string;
   reviews?: Review[];
 }
