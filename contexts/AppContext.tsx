@@ -18,7 +18,7 @@ interface AppContextType {
 
     // Auth
     signIn: (email: string, password: string) => Promise<{ error: any }>;
-    signUp: (data: Partial<User> & { password: string }) => Promise<{ error: any }>;
+    signUp: (data: Partial<User> & { password: string }) => Promise<{ data: any; error: any }>;
     signOut: () => Promise<void>;
 
     // Actions
@@ -170,8 +170,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
                 if (session) {
                     if (event === 'SIGNED_IN') {
-                        await fetchUserProfile(session.user.id);
-                        await fetchTransactions(session.user.id);
+                        // Non-blocking fetch to speed up UI transition
+                        fetchUserProfile(session.user.id);
+                        fetchTransactions(session.user.id);
                     }
                     // Setup Realtime Subscription
                     subscribeToMessages(session.user.id);
@@ -220,23 +221,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
 
     const fetchUserProfile = async (userId: string) => {
-        // Parallel Data Fetching for Performance
-        const [profileResult, portfolioResult, reviewsResult] = await Promise.all([
-            supabase.from('profiles').select('*').eq('id', userId).single(),
-            supabase.from('portfolio_items').select('*').eq('user_id', userId),
-            supabase.from('reviews').select('*').eq('user_id', userId)
-        ]);
-
-        const profileData = profileResult.data;
+        // 1. Fetch Core Profile FIRST for fast UI load
+        const { data: profileData, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
 
         if (profileData) {
+            // Set user immediately so app unlocks
             setCurrentUser({
                 ...profileData,
-                portfolio: portfolioResult.data || [],
-                reviews: reviewsResult.data || []
+                portfolio: [],
+                reviews: []
             });
 
-            // Fetch messages in parallel to UI rendering
+            // 2. Fetch secondary data in background
+            Promise.all([
+                supabase.from('portfolio_items').select('*').eq('user_id', userId),
+                supabase.from('reviews').select('*').eq('user_id', userId)
+            ]).then(([portfolioRes, reviewsRes]) => {
+                setCurrentUser(prev => prev ? ({
+                    ...prev,
+                    portfolio: portfolioRes.data || [],
+                    reviews: reviewsRes.data || []
+                }) : null);
+            });
+
+            // Fetch messages in parallel
             fetchMessages(profileData.id);
         } else if (userId) {
             // Self-Healing: If Auth exists but Profile is missing (e.g. Trigger failed), try to create it manually.
@@ -370,7 +378,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         // No manual insert needed. This ensures it works even if email confirmation is pending.
         // Note: The Trigger runs as SECURITY DEFINER, invoking admin privileges to bypass RLS.
 
-        return { error: authError };
+        return { data: authData, error: authError };
     };
 
     const signOut = async () => {

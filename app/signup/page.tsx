@@ -41,7 +41,7 @@ export default function SignupPage() {
         e.preventDefault();
         if (!role) return;
 
-        const { error } = await signUp({
+        const { data, error } = await signUp({
             ...formData,
             role,
             avatar: role === 'client' ? '🎓' : '💻',
@@ -49,11 +49,19 @@ export default function SignupPage() {
         });
 
         if (!error) {
-            setIsVerificationSent(true);
+            // Check if we have an active session (Auto-confirm enabled)
+            if (data?.session) {
+                router.push('/dashboard');
+            } else {
+                // Email confirmation required
+                setIsVerificationSent(true);
+            }
         } else {
             console.error(error);
             if (error.message?.includes('Database error')) {
                 setError('Setup Error: Please run the provided supabase_schema.sql in your Supabase SQL Editor to create the necessary tables and triggers.');
+            } else if (error.message?.includes('rate limit')) {
+                setError('Too many requests. Please wait a moment or check your email for a previous verification link.');
             } else {
                 setError(error.message || 'Failed to create account.');
             }
