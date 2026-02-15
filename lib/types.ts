@@ -144,6 +144,8 @@ export interface Project {
   location?: string;
 
   createdAt: string;
+  escrowBalance?: number;
+  totalPaid?: number;
 }
 
 // Internal Work Unit

@@ -59,6 +59,8 @@ CREATE TABLE IF NOT EXISTS public.projects (
   description TEXT NOT NULL,
   requirements TEXT,
   budget NUMERIC(10, 2) NOT NULL,
+  escrow_balance NUMERIC(10, 2) DEFAULT 0.00, -- Funds held for project
+  total_paid NUMERIC(10, 2) DEFAULT 0.00,   -- Funds already paid out
   timeline TEXT NOT NULL,
   level TEXT CHECK (level IN ('Undergraduate', 'Masters', 'PhD', 'Professional')),
   category TEXT NOT NULL, 

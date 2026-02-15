@@ -33,9 +33,12 @@ export default function BackgroundSlideshow({ images, duration = 5 }: Background
                     className="absolute inset-0 w-full h-full"
                 >
                     {/* Image Layer */}
-                    <div
-                        className="absolute inset-0 bg-cover bg-center bg-no-repeat transform scale-105"
+                    <motion.div
+                        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                         style={{ backgroundImage: `url(${images[currentIndex]})` }}
+                        initial={{ scale: 1.0 }}
+                        animate={{ scale: 1.15 }}
+                        transition={{ duration: duration + 1, ease: "linear" }}
                     />
 
                     {/* Overlay to ensure text readability */}

@@ -48,7 +48,7 @@ export default function HomePage() {
 
 
       {/* Hero Section */}
-      <section className="relative bg-slate-950 pt-24 pb-16 lg:pt-40 lg:pb-32 overflow-hidden rounded-b-[2rem] md:rounded-b-[4rem]">
+      <section className="relative bg-slate-950 pt-24 pb-16 lg:pt-40 lg:pb-32 overflow-hidden rounded-b-[2rem] md:rounded-b-[4rem] min-h-[60vh] flex flex-col justify-center">
         {/* Slideshow Background */}
         <BackgroundSlideshow images={slideImages} duration={6} />
 

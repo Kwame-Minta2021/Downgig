@@ -11,6 +11,41 @@ export default function ProjectDetailsPage() {
     const params = useParams(); // { id: string }
     const router = useRouter();
     const { getProjectById, currentUser, sendMessage } = useApp();
+    const [fundingLoading, setFundingLoading] = useState(false);
+
+    // Import action dynamically/directly might be tricky in client component if it's not passed down. 
+    // We should import from actions file.
+    // However, imports are at top. I need to add import too.
+
+    // ... imports logic inside the replacement content isn't possible if I'm targeting inside function.
+    // I will stick to adding state here and assuming I'll add import in next step or use require if needed (bad practice).
+    // Actually, I can replace the import line separately.
+
+    // Let's just add the state and handler here.
+
+    const handleFundProject = async () => {
+        if (!project || !currentUser) return;
+
+        // Confirm
+        if (!confirm(`Are you sure you want to transfer GH₵${project.budget.toLocaleString()} from your wallet to this project's escrow?`)) return;
+
+        setFundingLoading(true);
+        // We need to import this. I will assume it's imported or I will add the import in a separate step.
+        // Since I can't add the import line in this block easily without hitting top of file...
+        // I'll use a dynamic import for now or just add the import in a separate tool call.
+        const { fundProject } = await import('@/actions/payment');
+
+        const result = await fundProject(project.id, project.budget);
+
+        if (result.error) {
+            alert(result.error);
+        } else {
+            alert('Project funded successfully!');
+            // Refresh page or context
+            window.location.reload();
+        }
+        setFundingLoading(false);
+    };
 
     // Parse ID safely
     const projectId = params?.id ? Number(params.id) : 0;
@@ -152,7 +187,7 @@ export default function ProjectDetailsPage() {
 
                         {/* Owner Actions */}
                         {isOwner && (
-                            <div className="sticky top-24">
+                            <div className="sticky top-24 space-y-6">
                                 <div className="card bg-slate-50 border-slate-200">
                                     <h3 className="font-bold text-slate-900 mb-2">Project Management</h3>
                                     <p className="text-slate-600 text-sm mb-4">
@@ -163,6 +198,49 @@ export default function ProjectDetailsPage() {
                                             Contact Support
                                         </button>
                                     </Link>
+                                </div>
+
+                                {/* FUNDING CARD */}
+                                <div className="card bg-white border border-slate-200 shadow-sm relative overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-green-500"></div>
+                                    <h3 className="font-bold text-slate-900 mb-4 flex items-center">
+                                        <DollarSign className="w-5 h-5 mr-2 text-green-600" />
+                                        Project Funding
+                                    </h3>
+
+                                    <div className="space-y-3 mb-6">
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-slate-500">Total Budget</span>
+                                            <span className="font-bold text-slate-900">GH₵{project.budget.toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-slate-500">Escrow Balance</span>
+                                            <span className={`font-bold ${project.escrowBalance && project.escrowBalance >= project.budget ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                                GH₵{(project.escrowBalance || 0).toLocaleString()}
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-slate-100 rounded-full h-2">
+                                            <div
+                                                className={`h-2 rounded-full transition-all duration-1000 ${project.escrowBalance && project.escrowBalance >= project.budget ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                                                style={{ width: `${Math.min(100, ((project.escrowBalance || 0) / project.budget) * 100)}%` }}
+                                            ></div>
+                                        </div>
+                                    </div>
+
+                                    {(!project.escrowBalance || project.escrowBalance < project.budget) ? (
+                                        <button
+                                            onClick={handleFundProject}
+                                            disabled={fundingLoading}
+                                            className="btn btn-primary w-full shadow-lg shadow-blue-500/20"
+                                        >
+                                            {fundingLoading ? 'Processing...' : 'Fund Project Now'}
+                                        </button>
+                                    ) : (
+                                        <div className="bg-emerald-50 text-emerald-800 p-3 rounded-xl text-sm flex items-center justify-center gap-2 font-bold border border-emerald-100">
+                                            <Check className="w-5 h-5 bg-emerald-200 rounded-full p-0.5" />
+                                            Fully Funded
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}

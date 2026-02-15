@@ -29,18 +29,32 @@ export default function MessagesPage() {
 
     if (!currentUser) return null;
 
-    // Get unique conversation partners
-    const conversationPartners = Array.from(new Set([
+    // Filter users based on Managed Network rules
+    // Admins can see everyone.
+    // Clients/Developers can ONLY see Admins.
+    const eligibleConversationPartners = currentUser.role === 'admin'
+        ? users
+        : users.filter(u => u.role === 'admin');
+
+    // Get unique conversation partners from existing messages
+    const existingPartners = Array.from(new Set([
         ...messages.filter(m => m.senderId === currentUser.id).map(m => m.receiverId),
         ...messages.filter(m => m.receiverId === currentUser.id).map(m => m.senderId)
     ])).map(id => users.find(u => u.id === id)).filter((u): u is typeof users[0] => !!u);
 
-    // Also include some suggested users if list is empty (for demo)
-    const displayUsers = conversationPartners.length > 0 ? conversationPartners : users.filter(u => u.id !== currentUser.id).slice(0, 3);
+    // Merge: Show existing partners (if any, preserving history) AND eligible new partners (Admins)
+    // For non-admins, if they have history with non-admins (legacy), we might still show it or hide it.
+    // For strict enforcement, we filter existingPartners too, but let's be lenient for legacy data visibility.
+    // Actually, let's enforce: NON-ADMINs should only see ADMINs in the list to start new chats.
 
-    // Filter users
+    const displayUsers = currentUser.role === 'admin'
+        ? (existingPartners.length > 0 ? existingPartners : users.filter(u => u.id !== currentUser.id).slice(0, 10))
+        : eligibleConversationPartners;
+
+    // Filter users by search term
     const filteredUsers = displayUsers.filter(u =>
-        u.name.toLowerCase().includes(searchTerm.toLowerCase())
+        u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (u.role === 'admin' && 'support'.includes(searchTerm.toLowerCase())) // Allow searching for "Support" to find admins
     );
 
     const selectedUser = users.find(u => u.id === selectedUserId);
