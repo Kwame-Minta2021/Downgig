@@ -29,6 +29,11 @@ export default function Footer() {
                         <FooterLink href="/how-to-hire">How to Hire</FooterLink>
                         <FooterLink href="/developers">Talent Marketplace</FooterLink>
                         <FooterLink href="/projects">Project Catalog</FooterLink>
+                        <li>
+                            <a href="mailto:frederickminta@gmail.com" className="hover:text-amber-500 transition-colors">
+                                Schedule Consultation
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
