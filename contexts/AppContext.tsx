@@ -143,23 +143,37 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const initialize = async () => {
             setIsLoading(true);
 
-            // 1. Get Initial Session
-            const { data: { session } } = await supabase.auth.getSession();
+            // Safety timeout to prevent infinite loading
+            const timeoutId = setTimeout(() => {
+                if (mounted) setIsLoading(false);
+            }, 10000); // 10 seconds max loading
 
-            if (mounted) {
-                if (session) {
-                    // Only fetch user profile if we have a session
-                    await fetchUserProfile(session.user.id);
-                    await fetchTransactions(session.user.id); // Fetch transactions
-                } else {
-                    setCurrentUser(null);
+            try {
+                // 1. Get Initial Session
+                const { data: { session } } = await supabase.auth.getSession();
+
+                if (mounted) {
+                    if (session) {
+                        // Only fetch user profile if we have a session
+                        try {
+                            await fetchUserProfile(session.user.id);
+                            await fetchTransactions(session.user.id); // Fetch transactions
+                        } catch (err) {
+                            console.error('Data fetch error during init:', err);
+                        }
+                    } else {
+                        setCurrentUser(null);
+                    }
+
+                    // 2. Fetch Global Data (Projects, Public Users)
+                    fetchProjects();
+                    fetchUsers();
                 }
-
-                // 2. Fetch Global Data (Projects, Public Users)
-                fetchProjects();
-                fetchUsers();
-
-                setIsLoading(false);
+            } catch (err) {
+                console.error('Initialization error:', err);
+            } finally {
+                clearTimeout(timeoutId);
+                if (mounted) setIsLoading(false);
             }
         };
 
