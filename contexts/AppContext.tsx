@@ -338,8 +338,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // --- Auth Actions ---
 
     const signIn = async (email: string, password: string) => {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        return { error };
+        try {
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) {
+                console.error('Supabase SignIn Error:', error);
+                return { error };
+            }
+            return { error: null };
+        } catch (err) {
+            console.error('Unexpected SignIn Error:', err);
+            return { error: { message: 'Network or unexpected error occurred. Please check your connection.' } };
+        }
     };
 
     const signUp = async (userData: Partial<User> & { password: string }) => {

@@ -4,7 +4,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 if (!supabaseUrl || !supabaseKey) {
-    throw new Error('Missing Supabase Environment Variables');
+    console.error('Missing Supabase Environment Variables');
 }
 
 export const supabase = createBrowserClient(supabaseUrl, supabaseKey);

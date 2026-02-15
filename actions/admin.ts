@@ -170,3 +170,21 @@ export async function updateProjectStatus(projectId: number, status: 'open' | 'r
 
     return { error };
 }
+
+export async function getAllMeetings() {
+    const isAdmin = await verifyAdmin();
+    if (!isAdmin) return { error: 'Unauthorized' };
+
+    const supabase = await getSupabase();
+    const { data, error } = await supabase
+        .from('meetings')
+        .select(`
+            *,
+            host:host_id (name, email, avatar),
+            attendee:attendee_id (name, email, avatar)
+        `)
+        .order('start_time', { ascending: false });
+
+    if (error) return { error: error.message };
+    return { data };
+}

@@ -25,9 +25,10 @@ import {
     getAllClients,
     getAllTransactions,
     updateUserStatus,
-    updateProjectStatus
+    updateProjectStatus,
+    getAllMeetings
 } from '@/actions/admin';
-import { User, Transaction, Project } from '@/lib/types';
+import { User, Transaction, Project, Meeting } from '@/lib/types';
 
 interface AdminDashboardProps {
     initialStats: {
@@ -43,7 +44,7 @@ export default function AdminDashboard({ initialStats }: AdminDashboardProps) {
     const { currentUser } = useApp();
 
     // Local State
-    const [activeTab, setActiveTab] = useState<'overview' | 'pending' | 'projects' | 'clients' | 'transactions'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'pending' | 'projects' | 'clients' | 'transactions' | 'meetings'>('overview');
 
     // Pagination State
     const [page, setPage] = useState(1);
@@ -56,6 +57,7 @@ export default function AdminDashboard({ initialStats }: AdminDashboardProps) {
     const [pendingProjects, setPendingProjects] = useState<Project[]>([]);
     const [clients, setClients] = useState<User[]>([]);
     const [transactions, setTransactions] = useState<any[]>([]);
+    const [meetings, setMeetings] = useState<Meeting[]>([]);
 
     // Modal State
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -75,7 +77,7 @@ export default function AdminDashboard({ initialStats }: AdminDashboardProps) {
     }, [currentUser, router]);
 
     // Reset page when tab changes
-    const handleTabChange = (tab: 'overview' | 'pending' | 'projects' | 'clients' | 'transactions') => {
+    const handleTabChange = (tab: 'overview' | 'pending' | 'projects' | 'clients' | 'transactions' | 'meetings') => {
         if (tab !== activeTab) {
             setActiveTab(tab);
             setPage(1);
@@ -112,6 +114,12 @@ export default function AdminDashboard({ initialStats }: AdminDashboardProps) {
                 const res = await getAllTransactions(); // Helper returns all for now
                 if (res && !res.error) {
                     setTransactions(res.data || []);
+                    setTotalCount(res.data?.length || 0);
+                }
+            } else if (activeTab === 'meetings') {
+                const res = await getAllMeetings();
+                if (res && !res.error) {
+                    setMeetings(res.data as Meeting[] || []);
                     setTotalCount(res.data?.length || 0);
                 }
             }
@@ -197,6 +205,12 @@ export default function AdminDashboard({ initialStats }: AdminDashboardProps) {
                         className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${activeTab === 'transactions' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 hover:bg-slate-100'}`}
                     >
                         Transactions
+                    </button>
+                    <button
+                        onClick={() => handleTabChange('meetings')}
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${activeTab === 'meetings' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 hover:bg-slate-100'}`}
+                    >
+                        Meetings
                     </button>
                 </div>
             </div>
@@ -617,6 +631,80 @@ export default function AdminDashboard({ initialStats }: AdminDashboardProps) {
                                         </div>
                                     ) : (
                                         <div className="p-8 text-center text-slate-500 flex-1">No transactions found.</div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Meetings List */}
+                            {activeTab === 'meetings' && (
+                                <div className="flex-1 flex flex-col">
+                                    <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+                                        <h2 className="font-bold text-slate-800">Scheduled Meetings</h2>
+                                    </div>
+                                    {meetings && meetings.length > 0 ? (
+                                        <div className="overflow-x-auto flex-1">
+                                            <table className="w-full text-left">
+                                                <thead>
+                                                    <tr className="border-b border-slate-100 text-sm text-slate-500">
+                                                        <th className="px-6 py-3 font-medium">Topic</th>
+                                                        <th className="px-6 py-3 font-medium">Host</th>
+                                                        <th className="px-6 py-3 font-medium">Attendee</th>
+                                                        <th className="px-6 py-3 font-medium">Time</th>
+                                                        <th className="px-6 py-3 font-medium">Duration</th>
+                                                        <th className="px-6 py-3 font-medium">Status</th>
+                                                        <th className="px-6 py-3 font-medium text-right">Link</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100">
+                                                    {meetings.map(meeting => (
+                                                        <tr key={meeting.id} className="hover:bg-slate-50/50 transition-colors">
+                                                            <td className="px-6 py-4">
+                                                                <span className="font-medium text-slate-900 block">{meeting.title}</span>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-xs">
+                                                                        {(meeting as any).host?.avatar || (meeting as any).host?.name?.charAt(0) || '?'}
+                                                                    </div>
+                                                                    <span className="text-sm text-slate-700">{(meeting as any).host?.name || 'Unknown'}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-xs">
+                                                                        {(meeting as any).attendee?.avatar || (meeting as any).attendee?.name?.charAt(0) || '?'}
+                                                                    </div>
+                                                                    <span className="text-sm text-slate-700">{(meeting as any).attendee?.name || 'Unknown'}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4 text-slate-600 text-sm">
+                                                                {new Date(meeting.startTime).toLocaleString()}
+                                                            </td>
+                                                            <td className="px-6 py-4 text-slate-600">
+                                                                {meeting.durationMinutes} mins
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <span className={`px-2 py-1 rounded-full text-xs font-bold ${meeting.status === 'completed' ? 'bg-green-100 text-green-700' :
+                                                                        meeting.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                                                                            'bg-blue-100 text-blue-700'
+                                                                    }`}>
+                                                                    {meeting.status.toUpperCase()}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-6 py-4 text-right">
+                                                                {meeting.link ? (
+                                                                    <a href={meeting.link} target="_blank" className="text-blue-600 hover:underline text-sm font-medium">Join</a>
+                                                                ) : (
+                                                                    <span className="text-slate-400 text-sm">-</span>
+                                                                )}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ) : (
+                                        <div className="p-8 text-center text-slate-500 flex-1">No scheduled meetings found.</div>
                                     )}
                                 </div>
                             )}
