@@ -27,15 +27,17 @@ export default function DevelopersPage() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link href="/projects/new">
-                            <Button size="lg" className="rounded-full px-8 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold border-none text-lg h-14">
-                                Start a Project
-                            </Button>
+                        <Link
+                            href="/projects/new"
+                            className="inline-flex items-center justify-center rounded-full px-8 py-4 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold border-none text-lg h-14 transition-all duration-200 shadow-lg shadow-amber-500/30"
+                        >
+                            Start a Project
                         </Link>
-                        <a href="mailto:frederickminta@gmail.com">
-                            <Button size="lg" variant="outline" className="rounded-full px-8 border-slate-700 text-white hover:bg-white/10 font-bold text-lg h-14">
-                                Schedule Consultation
-                            </Button>
+                        <a
+                            href="mailto:frederickminta@gmail.com"
+                            className="inline-flex items-center justify-center rounded-full px-8 py-4 border-2 border-slate-700 text-white hover:bg-white/10 font-bold text-lg h-14 transition-all duration-200"
+                        >
+                            Schedule Consultation
                         </a>
                     </div>
                 </motion.div>

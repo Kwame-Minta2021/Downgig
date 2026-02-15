@@ -94,11 +94,17 @@ export default function Header() {
                             </div>
                         ) : (
                             <div className="flex items-center gap-3">
-                                <Link href="/login">
-                                    <Button variant="ghost" size="sm">Log In</Button>
+                                <Link
+                                    href="/login"
+                                    className="px-3 py-1.5 text-xs font-medium bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-xl transition-all duration-200"
+                                >
+                                    Log In
                                 </Link>
-                                <Link href="/signup">
-                                    <Button variant="primary" size="sm" className="shadow-lg shadow-blue-500/25">Get Started</Button>
+                                <Link
+                                    href="/signup"
+                                    className="px-3 py-1.5 text-xs font-medium bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:shadow-lg hover:shadow-amber-500/30 border border-transparent font-bold tracking-wide rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/25"
+                                >
+                                    Get Started
                                 </Link>
                             </div>
                         )}
@@ -212,11 +218,19 @@ export default function Header() {
                                         </MobileNavLink>
                                     </div>
                                     <div className=" pt-8 border-t border-slate-100 flex flex-col gap-4">
-                                        <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                                            <Button variant="ghost" size="lg" className="w-full justify-start">Log In</Button>
+                                        <Link
+                                            href="/login"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className="w-full justify-start px-8 py-4 text-base font-semibold bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-xl transition-all duration-200 inline-flex items-center"
+                                        >
+                                            Log In
                                         </Link>
-                                        <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                                            <Button variant="primary" size="lg" className="w-full shadow-lg shadow-blue-500/25">Get Started</Button>
+                                        <Link
+                                            href="/signup"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className="w-full shadow-lg shadow-blue-500/25 px-8 py-4 text-base font-semibold bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:shadow-lg hover:shadow-amber-500/30 border border-transparent tracking-wide rounded-xl transition-all duration-200 inline-flex items-center justify-center"
+                                        >
+                                            Get Started
                                         </Link>
                                     </div>
                                 </div>

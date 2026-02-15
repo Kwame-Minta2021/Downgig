@@ -74,15 +74,17 @@ export default function HomePage() {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="flex flex-col sm:flex-row justify-center gap-4 mb-12"
           >
-            <Link href="/projects/new">
-              <Button size="lg" className="rounded-full px-8 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold border-none transition-all hover:scale-105 active:scale-95 text-lg h-14 w-full sm:w-auto">
-                Start a Project
-              </Button>
+            <Link
+              href="/projects/new"
+              className="inline-flex items-center justify-center rounded-full px-8 py-4 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold border-none transition-all hover:scale-105 active:scale-95 text-lg h-14 w-full sm:w-auto shadow-lg shadow-amber-500/30"
+            >
+              Start a Project
             </Link>
-            <Link href="/signup">
-              <Button size="lg" variant="outline" className="rounded-full px-8 border-white/20 text-white hover:bg-white/10 font-bold transition-all hover:scale-105 active:scale-95 text-lg h-14 w-full sm:w-auto backdrop-blur-sm">
-                Join Delivery Network
-              </Button>
+            <Link
+              href="/signup"
+              className="inline-flex items-center justify-center rounded-full px-8 py-4 border-2 border-white/20 text-white hover:bg-white/10 font-bold transition-all hover:scale-105 active:scale-95 text-lg h-14 w-full sm:w-auto backdrop-blur-sm"
+            >
+              Join Delivery Network
             </Link>
           </motion.div>
 
@@ -206,15 +208,17 @@ export default function HomePage() {
             Stop gambling on gig marketplaces. Partner with a managed delivery network.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Link href="/projects/new">
-              <Button size="lg" className="bg-amber-500 text-slate-900 hover:bg-amber-400 border-none shadow-xl shadow-amber-900/20 px-10 h-14 text-lg font-bold rounded-full">
-                Start a New Project
-              </Button>
+            <Link
+              href="/projects/new"
+              className="inline-flex items-center justify-center rounded-full px-10 py-4 bg-amber-500 text-slate-900 hover:bg-amber-400 border-none shadow-xl shadow-amber-900/20 text-lg font-bold h-14 transition-all duration-200"
+            >
+              Start a New Project
             </Link>
-            <Link href="/signup">
-              <Button size="lg" variant="outline" className="border-slate-700 text-white hover:bg-white/5 px-10 h-14 text-lg font-medium rounded-full">
-                Developer Application
-              </Button>
+            <Link
+              href="/signup"
+              className="inline-flex items-center justify-center rounded-full px-10 py-4 border-2 border-slate-700 text-white hover:bg-white/5 text-lg font-medium h-14 transition-all duration-200"
+            >
+              Developer Application
             </Link>
           </div>
         </div>
