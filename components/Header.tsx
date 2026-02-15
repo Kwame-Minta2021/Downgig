@@ -16,6 +16,7 @@ export default function Header() {
     const { currentUser, signOut } = useApp();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [isSigningOut, setIsSigningOut] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -28,6 +29,7 @@ export default function Header() {
     const isActive = (path: string) => pathname === path;
 
     const handleSignOut = async () => {
+        setIsSigningOut(true);
         await signOut();
         // AppContext handles redirect
     };
@@ -87,9 +89,10 @@ export default function Header() {
                                     onClick={handleSignOut}
                                     variant="ghost"
                                     size="sm"
-                                    className="hidden sm:flex"
+                                    disabled={isSigningOut}
+                                    className="hidden sm:flex disabled:opacity-50"
                                 >
-                                    Sign Out
+                                    {isSigningOut ? 'Signing Out...' : 'Sign Out'}
                                 </Button>
                             </div>
                         ) : (
@@ -201,9 +204,10 @@ export default function Header() {
                                                 setMobileMenuOpen(false);
                                             }}
                                             variant="ghost"
-                                            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                                            disabled={isSigningOut}
+                                            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 disabled:opacity-50"
                                         >
-                                            Sign Out
+                                            {isSigningOut ? 'Signing Out...' : 'Sign Out'}
                                         </Button>
                                     </div>
                                 </div>

@@ -16,6 +16,8 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
+    const [isLoading, setIsLoading] = useState(false);
+
     useEffect(() => {
         if (currentUser) {
             router.push('/dashboard');
@@ -25,19 +27,29 @@ export default function LoginPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setIsLoading(true);
 
-        const { error } = await signIn(email, password);
-        if (!error) {
-            router.push('/dashboard');
-        } else {
-            console.error('Login error:', error);
-            if (error.message.includes('Invalid login credentials')) {
-                setError('Invalid email or password. Please check your credentials.');
-            } else if (error.message.includes('Email not confirmed')) {
-                setError('Please verify your email address before logging in. Check your inbox (and spam folder) for the confirmation link.');
+        try {
+            const { error } = await signIn(email, password);
+            if (!error) {
+                router.push('/dashboard');
             } else {
-                setError(error.message || 'Failed to sign in. Please try again.');
+                console.error('Login error:', error);
+                // Handle various Supabase error formats
+                const errorMsg = error.message || error.error_description || 'An unexpected error occurred';
+
+                if (errorMsg.includes('Invalid login credentials') || errorMsg.includes('Invalid credentials')) {
+                    setError('Invalid email or password. Please check your credentials.');
+                } else if (errorMsg.includes('Email not confirmed')) {
+                    setError('Please verify your email address. Check your inbox for the confirmation link.');
+                } else {
+                    setError(errorMsg);
+                }
+                setIsLoading(false);
             }
+        } catch (err) {
+            setError('An unexpected network error occurred. Please try again.');
+            setIsLoading(false);
         }
     };
 
@@ -67,8 +79,11 @@ export default function LoginPage() {
                     <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
-                        className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl mb-6 text-sm font-medium"
+                        className="bg-red-500/10 border border-red-500/20 text-red-100 px-4 py-3 rounded-xl mb-6 text-sm font-medium flex items-center gap-2"
                     >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 flex-shrink-0 text-red-500">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
                         {error}
                     </motion.div>
                 )}
@@ -82,7 +97,8 @@ export default function LoginPage() {
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="you@university.edu"
                             required
-                            className="bg-slate-900/50 border-slate-700 text-slate-100 placeholder:text-slate-600 focus:border-amber-500/50 focus:ring-amber-500/20"
+                            disabled={isLoading}
+                            className="bg-slate-900/50 border-slate-700 text-slate-100 placeholder:text-slate-600 focus:border-amber-500/50 focus:ring-amber-500/20 disabled:opacity-50"
                         />
                     </div>
 
@@ -95,15 +111,27 @@ export default function LoginPage() {
                             placeholder="••••••••"
                             required
                             minLength={6}
-                            className="bg-slate-900/50 border-slate-700 text-slate-100 placeholder:text-slate-600 focus:border-amber-500/50 focus:ring-amber-500/20"
+                            disabled={isLoading}
+                            className="bg-slate-900/50 border-slate-700 text-slate-100 placeholder:text-slate-600 focus:border-amber-500/50 focus:ring-amber-500/20 disabled:opacity-50"
                         />
                         <a href="#" className="text-xs text-amber-500 hover:text-amber-400 font-medium absolute right-0 top-0">
                             Forgot password?
                         </a>
                     </div>
 
-                    <Button type="submit" variant="primary" size="lg" className="w-full text-lg shadow-lg shadow-amber-900/20 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 border-none">
-                        Sign In
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        size="lg"
+                        disabled={isLoading}
+                        className="w-full text-lg shadow-lg shadow-amber-900/20 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 border-none disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                        {isLoading ? (
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+                                Signing In...
+                            </div>
+                        ) : 'Sign In'}
                     </Button>
                 </form>
 
