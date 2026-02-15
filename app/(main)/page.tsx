@@ -48,7 +48,7 @@ export default function HomePage() {
 
 
       {/* Hero Section */}
-      <section className="relative bg-slate-950 pt-24 pb-16 lg:pt-40 lg:pb-32 overflow-hidden rounded-b-[2rem] md:rounded-b-[4rem] min-h-[60vh] flex flex-col justify-center">
+      <section className="relative bg-slate-950 pt-24 pb-16 lg:pt-40 lg:pb-32 overflow-hidden rounded-b-[2rem] md:rounded-b-[4rem] min-h-[60dvh] flex flex-col justify-center">
         {/* Slideshow Background */}
         <BackgroundSlideshow images={slideImages} duration={6} />
 
@@ -59,11 +59,11 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="text-4xl md:text-7xl lg:text-8xl font-serif font-bold text-white tracking-tight mb-6 md:mb-8 leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif font-bold text-white tracking-tight mb-6 md:mb-8 leading-tight">
               Engineering Delivered. <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200">Not Just Promised.</span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed font-light">
+            <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed font-light px-4">
               We don't just find you developers—we build your software. DownGigs recruits, manages, and guarantees the work of top technical talent so you can focus on growing your business.
             </p>
           </motion.div>

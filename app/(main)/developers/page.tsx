@@ -19,7 +19,7 @@ export default function DevelopersPage() {
                     transition={{ duration: 0.6 }}
                     className="relative z-10 max-w-4xl mx-auto"
                 >
-                    <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-6 tracking-tight">
+                    <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-6 tracking-tight px-4">
                         Access <span className="text-amber-500">Vetted</span> Technical Talent
                     </h1>
                     <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-light">
