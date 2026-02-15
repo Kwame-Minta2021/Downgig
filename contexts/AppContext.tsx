@@ -37,6 +37,7 @@ interface AppContextType {
     scheduleMeeting: (data: any) => Promise<void>;
     addPortfolioItem: (item: any) => Promise<void>;
     updateProfile: (updates: Partial<User>) => Promise<{ error: any }>;
+    updateUserStatus: (userId: string, status: User['status']) => Promise<{ error: any }>;
     uploadImage: (file: File, folder?: string) => Promise<string>;
 }
 
@@ -497,6 +498,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return { error };
     };
 
+    const updateUserStatus = async (userId: string, status: User['status']) => {
+        if (!currentUser || currentUser.role !== 'admin') return { error: 'Unauthorized' };
+
+        const { error } = await supabase
+            .from('profiles')
+            .update({ status })
+            .eq('id', userId);
+
+        if (!error) {
+            await fetchUsers();
+        }
+        return { error };
+    };
+
     const uploadImage = async (file: File, folder: string = 'uploads') => {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
@@ -540,6 +555,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             scheduleMeeting,
             addPortfolioItem,
             updateProfile,
+            updateUserStatus,
             uploadImage
         }}>
             {children}
